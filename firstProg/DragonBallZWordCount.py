@@ -3,6 +3,8 @@ from pyspark import SparkContext
 sc= SparkContext("local[*]","WordCount")
 rdd1=sc.textFile("E://Seekho Big Data/DragonBallZ.txt")
 print(rdd1.getNumPartitions())
+rdd_repartitioned=rdd1.repartition(8)       #increasing partitions
+print(rdd1.getNumPartitions())
 rdd2=rdd1.flatMap(lambda x:x.split(" "))
 rdd3=rdd2.map(lambda x:(x,1))
 rdd4=rdd3.reduceByKey(lambda x,y:x+y)
