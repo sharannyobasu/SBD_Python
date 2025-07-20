@@ -32,3 +32,6 @@ print("Cartesian: ", rdd_cartesian.collect())
 print("Even numbers: ", rdd_even.collect())
 print("Left Join: ", rdd_leftjoin.collect())
 
+output_path=r"E:\Seekho Big Data\PySpark\TestOutputDumps\tests\tests2"
+rdd4.coalesce(2)
+rdd4.saveAsTextFile(output_path)
