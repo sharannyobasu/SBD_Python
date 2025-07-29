@@ -29,7 +29,8 @@ df2=spark.createDataFrame(data2, data2_schema)
 
 df3=df1.join(df2, on="EmployeeID", how="Left")
 
-df3=df3.withColumn("Salary", coalesce(col("Salary"), lit(0.00))).withColumn("Joining_Date", coalesce(col("Joining_Date"), lit("2024-01-01")))
+df3=df3.withColumn("Salary", coalesce(col("Salary"), lit(0.00))) \
+    .withColumn("Joining_Date", coalesce(col("Joining_Date"), lit("2024-01-01")))
 df3=df3.withColumn("Joining_Date", to_date(col("Joining_Date"), "yyyy-MM-dd"))
 
 df4=df3.groupBy(col("Designation")).agg(avg(col("Salary")).alias("AvgSalary"))
