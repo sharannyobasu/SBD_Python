@@ -36,4 +36,16 @@ avgSalary=avgSalaryDF.agg(avg("Salary")).collect()[0][0]
 df3=df3.withColumn("EmployeeID", coalesce(col("EmployeeID"), lit(9999))) \
     .withColumn("Designation", coalesce(col("Designation"), lit("Unknown"))) \
     .withColumn("Salary", coalesce(col("Salary"), lit(avgSalary)))
+
+df3=df3.withColumn("DOJ", coalesce(col("DOJ"), lit("2024-01-01"))) \
+    .withColumn("Salary", col("Salary").cast("Int")) \
+    .withColumn("DOJ", to_date(col("DOJ"), "yyyy-MM-dd")) \
+
+df3=df3.withColumn("CurrentDate", lit(current_date())).withColumn("MonthsWorked", months_between(col("CurrentDate"), col("DOJ")).cast("Int"))
+df3=df3.withColumn("BudgetForecast", col("Salary")*col("MonthsWorked")).drop("MonthsWorked")
+
 df3.show()
+
+totalBudget=int(df3.agg(sum(col("BudgetForecast"))).collect()[0][0])
+
+print("The total budget till today: ", totalBudget)
