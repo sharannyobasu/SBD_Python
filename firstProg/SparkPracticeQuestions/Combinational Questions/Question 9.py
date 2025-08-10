@@ -40,9 +40,20 @@ df=spark.createDataFrame(data, schema)
 df=df.withColumn("day_joined", date_format(col("join_date"), 'EEEE'))
 df=df.withColumn("join_date", to_date(col("join_date"), "yyyy-MM-dd"))
 
-# Create weekend_joiner flag if joined on Saturday or Sunday
-df=df.withColumn("weekendJoiner", when(col(("day_joined")=='Sunday') | (col("day_joined")=='Saturday'), "No").otherwise("No"))
 
-#df=df.withColumn("tenure", when(current_date()-col(")).when().otherwise("No"))
+# Create weekend_joiner flag if joined on Saturday or Sunday
+df=df.withColumn("weekendJoiner", when((col("day_joined")=='Sunday') | (col("day_joined")=='Saturday'), "Yes").otherwise("No"))
+
+
+# Check if email domain is one of popular domains: ["gmail", "yahoo", "hotmail"]
+df=df.withColumn("domain", regexp_extract(col("email"), "@([a-zA-Z0-9]+)\.", 1))
+df=df.withColumn("registeredDomains", when(col("domain").isin(["gmail", "yahoo", "hotmail"]), "Yes").otherwise("No")).drop(col("domain"))
+
+
+# Based on tenure:
+# <1 year -> "Fresher"
+# 1-3 years -> "Stable"
+# 3 years -> "Long-Term"
+df=df.withColumn("tenure", when((datediff(current_date(), col("join_date"))/365)<1, "Fresher").when(((datediff(current_date(), col("join_date"))/365)>=1.00) & ((datediff(current_date(), col("join_date"))/365)<3.00), "Stable").otherwise("Long-Term"))
 
 df.show()
