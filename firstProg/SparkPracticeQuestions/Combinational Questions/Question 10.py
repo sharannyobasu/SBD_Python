@@ -41,7 +41,10 @@ df=spark.createDataFrame(data, schema)
 # Join month ≤ 6 → "H1"
 # ≥ 6 → "H2"
 df=df.withColumn("Join_Date", to_date(col("Join_Date"), "yyyy-MM-dd"))
-df=df.withColumn("join_half", when((month(col("Join_Date"))/6)<=1, "Q1").otherwise("Q2"))
+df=df.withColumn("join_half", when((month(col("Join_Date"))/6)<=1, "H1").otherwise("H2"))
+
+# Derive email_provider from domain (lowercased)
+df=df.withColumn("email_provider", lower(regexp_extract(col("Email"), "@([a-zA-Z0-9]+)\.", 1)))
 
 # Flag overpaid_flag:
 # If salary > 100000 and experience < 2 years → "Yes"
